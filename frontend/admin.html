@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin - Adevos Min-Bot</title>
+<link rel="icon" href="assets/icons/icon-32.png" />
+<meta name="theme-color" content="#0a0605" />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/components.css" />
+<style>
+  :root { --ring: #ffb020; --ring-dim: #b57c14; --ring-glow: rgba(255,176,32,0.3); }
+
+  .admin-shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+  @media (max-width: 860px) { .admin-shell { grid-template-columns: 1fr; } }
+  .admin-sidebar { border-right: 1px solid var(--line); padding: 22px 16px; }
+  .admin-badge {
+    display: inline-block; font-family: var(--font-mono); font-size: 0.72rem;
+    color: var(--warning); border: 1px solid rgba(255,176,32,0.35); border-radius: 999px;
+    padding: 3px 10px; margin-bottom: 18px;
+  }
+  .admin-page { padding: 26px; }
+  .admin-view { display: none; }
+  .admin-view.active { display: block; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  th { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.06em; }
+  .table-wrap { overflow-x: auto; }
+
+  .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .auth-card { width: 100%; max-width: 380px; background: var(--bg-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 34px; }
+</style>
+</head>
+<body>
+
+<!-- ADMIN LOGIN -->
+<div class="auth-wrap" id="adminLoginScreen">
+  <div class="auth-card">
+    <span class="admin-badge">Restricted area</span>
+    <h1 style="font-size:1.3rem;">Admin sign in</h1>
+    <form id="adminLoginForm">
+      <div class="field"><label>Admin username</label><input id="adminUsername" required /></div>
+      <div class="field"><label>Admin password</label><input id="adminPassword" type="password" required /></div>
+      <div class="field-error" id="adminLoginError" style="display:none;"></div>
+      <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div class="admin-shell" id="adminApp" style="display:none;">
+  <aside class="admin-sidebar">
+    <span class="admin-badge">Admin</span>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <button class="side-link active" data-admin-view="overview">Overview</button>
+      <button class="side-link" data-admin-view="sessions">WhatsApp sessions</button>
+      <button class="side-link" data-admin-view="users">Users</button>
+      <button class="side-link" data-admin-view="platform-settings">Platform settings</button>
+      <button class="side-link" id="adminLogoutBtn" style="margin-top:20px;">Logout</button>
+    </div>
+  </aside>
+
+  <div class="admin-page">
+    <section class="admin-view active" id="admin-overview">
+      <h2>Overview</h2>
+      <div class="overview-stats" style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+        <div class="stat-card"><div class="value" id="statTotalUsers">-</div><div class="label">Total users</div></div>
+        <div class="stat-card"><div class="value" id="statActiveSessions">-</div><div class="label">Active sessions</div></div>
+        <div class="stat-card"><div class="value" id="statBannedSessions">-</div><div class="label">Banned sessions</div></div>
+      </div>
+    </section>
+
+    <section class="admin-view" id="admin-sessions">
+      <h2>WhatsApp sessions</h2>
+      <div class="table-wrap card">
+        <table>
+          <thead><tr><th>Number</th><th>Status</th><th>Connected via</th><th>Last connected</th><th></th></tr></thead>
+          <tbody id="sessionsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-view" id="admin-users">
+      <h2>Users</h2>
+      <div class="table-wrap card">
+        <table>
+          <thead><tr><th>Username</th><th>Telegram</th><th>WhatsApp</th><th>Role</th><th>Status</th><th></th></tr></thead>
+          <tbody id="usersTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-view" id="admin-platform-settings">
+      <h2>Platform settings</h2>
+      <div class="card">
+        <div class="field">
+          <label>WhatsApp auto-join group invite links (one per line)</label>
+          <textarea id="settingInviteLinks" rows="4"></textarea>
+        </div>
+        <div class="field">
+          <label>WhatsApp auto-follow newsletter JIDs (one per line)</label>
+          <textarea id="settingNewsletterJids" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label>Telegram required group</label>
+          <input id="settingTgGroup" placeholder="@yourgroup" />
+        </div>
+        <div class="field">
+          <label>Telegram required channels (comma separated)</label>
+          <input id="settingTgChannels" placeholder="@channel1, @channel2" />
+        </div>
+        <div class="toggle-row">
+          <span>Maintenance mode</span>
+          <label class="switch"><input type="checkbox" id="settingMaintenance" /><span class="track"></span></label>
+        </div>
+        <button class="btn btn-primary" id="saveSettingsBtn" style="margin-top:16px;">Save settings</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

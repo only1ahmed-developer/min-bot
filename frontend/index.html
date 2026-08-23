@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Adevos Min-Bot - Manage WhatsApp and Telegram Bots From One Dashboard</title>
+<meta name="description" content="Connect and manage your WhatsApp and Telegram bots, groups, and automation from a single account." />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="assets/icons/icon-32.png" />
+<link rel="apple-touch-icon" href="assets/icons/icon-180.png" />
+<meta name="theme-color" content="#06090a" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/components.css" />
+<style>
+  .hero {
+    padding: 90px 0 70px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--ring);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px;
+    margin-bottom: 18px;
+  }
+  .hero h1 { font-size: clamp(2.1rem, 4vw, 3.4rem); line-height: 1.08; }
+  .hero p.lead { font-size: 1.05rem; max-width: 46ch; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+  .hero-visual { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .hero-visual .ring-lg .platforms { position: absolute; display: flex; gap: 26px; }
+  .platform-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-inset); border: 1px solid var(--line);
+    padding: 8px 14px; border-radius: 999px; font-size: 0.82rem;
+  }
+
+  section { padding: 64px 0; border-top: 1px solid var(--line); }
+  .section-head { max-width: 640px; margin-bottom: 36px; }
+  .section-head .eyebrow { margin-bottom: 14px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  @media (max-width: 860px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .connect-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 860px) { .connect-grid { grid-template-columns: 1fr; } .hero { grid-template-columns: 1fr; } }
+
+  .tab-row { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab-btn {
+    flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--line);
+    background: transparent; color: var(--text-muted); font-family: var(--font-body); cursor: pointer;
+  }
+  .tab-btn.active { border-color: var(--ring-dim); color: var(--text); }
+  .connect-panel { display: none; }
+  .connect-panel.active { display: block; }
+
+  .code-display {
+    font-family: var(--font-mono); font-size: 1.6rem; letter-spacing: 0.1em;
+    text-align: center; padding: 18px; border: 1px dashed var(--line);
+    border-radius: var(--radius-sm); margin: 16px 0; color: var(--ring);
+  }
+  .status-line { display: flex; align-items: center; gap: 10px; margin-top: 14px; color: var(--text-muted); font-size: 0.9rem; }
+
+  .about-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 860px) { .about-grid { grid-template-columns: 1fr; } }
+
+  footer { border-top: 1px solid var(--line); padding: 48px 0 28px; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 32px; margin-bottom: 32px; }
+  @media (max-width: 700px) { .footer-grid { grid-template-columns: 1fr; } }
+  .footer-grid h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+  .footer-grid ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+  .footer-grid a { text-decoration: none; color: var(--text-muted); font-size: 0.92rem; }
+  .footer-grid a:hover { color: var(--text); }
+  .footer-bottom { border-top: 1px solid var(--line); padding-top: 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: var(--text-faint); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/icon-192.png" alt="Adevos Min-Bot logo" />
+      <span>Adevos Min-Bot</span>
+    </a>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#stats">Statistics</a>
+      <a href="#connect">Connect Bot</a>
+      <a href="login.html">Login</a>
+    </div>
+    <div class="nav-actions">
+      <a class="btn btn-outline" href="login.html" style="display:none" id="navLoginDesktop">Login</a>
+      <button class="nav-toggle" aria-label="Open menu">&#9776;</button>
+    </div>
+  </div>
+</nav>
+
+<header class="container hero" id="home">
+  <div>
+    <span class="eyebrow">One account, two platforms</span>
+    <h1>Run your WhatsApp and Telegram bots from a single dashboard.</h1>
+    <p class="lead">Adevos Min-Bot pairs a WhatsApp Multi-Device number and a Telegram bot to the same
+      account, so groups, settings, and status all live in one place instead of two.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#connect" data-tab-target="whatsapp">Connect WhatsApp Bot</a>
+      <a class="btn btn-outline" href="#connect" data-tab-target="telegram">Connect Telegram Bot</a>
+      <a class="btn btn-outline" href="login.html">Login</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="ring-lg">
+      <img src="assets/icons/icon-192.png" width="96" height="96" alt="" style="position:relative; z-index:1;" />
+    </div>
+  </div>
+</header>
+
+<section id="stats">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Live numbers</span>
+      <h2>The platform right now</h2>
+    </div>
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="value" data-stat="totalUsers">0</div><div class="label">Total users</div></div>
+      <div class="stat-card"><div class="value" data-stat="activeWhatsappSessions">0</div><div class="label">Active WhatsApp sessions</div></div>
+      <div class="stat-card"><div class="value" data-stat="totalConnectedBots">0</div><div class="label">Connected bots</div></div>
+      <div class="stat-card"><div class="value" data-stat="totalGroups">0</div><div class="label">Managed groups</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="connect">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Get connected</span>
+      <h2>Connect a bot</h2>
+    </div>
+    <div class="connect-grid">
+
+      <div class="card">
+        <h3>WhatsApp Bot</h3>
+        <div class="tab-row">
+          <button class="tab-btn active" data-wa-tab="pair">Pair code</button>
+          <button class="tab-btn" data-wa-tab="qr">QR code</button>
+        </div>
+
+        <div class="connect-panel active" id="waPairPanel">
+          <p>Enter your number with country code, no leading zero. You need a website account first
+            (create one from the Telegram bot with <code>/createlogins</code>, or from WhatsApp
+            privately with <code>.createlogins</code>), then log in to request a pairing code.</p>
+          <a class="btn btn-primary btn-block" href="login.html">Log in to pair a number</a>
+        </div>
+
+        <div class="connect-panel" id="waQrPanel">
+          <div class="state-block">
+            <h3>QR pairing is available after login</h3>
+            <p>The dashboard renders a live QR code from the backend once you are signed in.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Telegram Bot</h3>
+        <p>The Telegram bot handles account creation, WhatsApp pairing by command, and group
+          management on Telegram's side.</p>
+        <ul style="color:var(--text-muted); padding-left:20px;">
+          <li>Send <code>/start</code> to see available commands</li>
+          <li>Send <code>/createlogins &lt;username&gt;</code> to get your website login</li>
+          <li>Send <code>/pair &lt;number&gt;</code> to connect a WhatsApp number</li>
+        </ul>
+        <a class="btn btn-primary btn-block" id="openTelegramBtn" href="#" target="_blank" rel="noopener">Open Telegram Bot</a>
+        <p class="field-hint" style="margin-top:10px;">You must join the required group/channels before the bot will respond.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">Why Adevos Min-Bot</span>
+      <h2>One account. Every group. Both platforms.</h2>
+      <p>Whether you start on Telegram, on WhatsApp, or from the website, your account links
+        together automatically so nothing you manage is split across two logins.</p>
+    </div>
+    <div class="about-grid">
+      <div class="card">
+        <h3>WhatsApp Multi-Device</h3>
+        <p>Pair a number with a code, keep it stateless, and manage groups, anti-link, and welcome
+          messages without opening WhatsApp.</p>
+      </div>
+      <div class="card">
+        <h3>Telegram automation</h3>
+        <p>Forced-subscription gating, account creation, and WhatsApp pairing, all from the same
+          Telegram bot your community already uses.</p>
+      </div>
+      <div class="card">
+        <h3>Unified dashboard</h3>
+        <p>See both bots, every connected group, and current status in one place, with an admin
+          panel for platform-wide control.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="brand" href="index.html"><img src="assets/icons/icon-192.png" alt="" /><span>Adevos Min-Bot</span></a>
+        <p style="margin-top:14px; max-width:36ch;">A unified platform for managing WhatsApp and Telegram bots from one account.</p>
+      </div>
+      <div>
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#connect">Connect Bot</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; <span id="year"></span> Adevos Min-Bot. All rights reserved.</span>
+      <span>Built on Adevos-X Tech infrastructure.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/ui.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Telegram bot deep link is configurable, not hard-coded to a real service.
+  window.ADEVOS_TELEGRAM_BOT_USERNAME = window.ADEVOS_TELEGRAM_BOT_USERNAME || 'AdevosMinBot';
+  document.getElementById('openTelegramBtn').href = `https://t.me/${window.ADEVOS_TELEGRAM_BOT_USERNAME}`;
+
+  document.querySelectorAll('[data-tab-target]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const target = el.dataset.tabTarget === 'telegram' ? 'telegram' : 'pair';
+      if (target === 'pair') document.querySelector('[data-wa-tab="pair"]').click();
+    });
+  });
+
+  document.querySelectorAll('[data-wa-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-wa-tab]').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('waPairPanel').classList.toggle('active', btn.dataset.waTab === 'pair');
+      document.getElementById('waQrPanel').classList.toggle('active', btn.dataset.waTab === 'qr');
+    });
+  });
+
+  if (Api.getToken()) {
+    document.getElementById('navLoginDesktop').textContent = 'Dashboard';
+    document.getElementById('navLoginDesktop').href = 'dashboard.html';
+    document.getElementById('navLoginDesktop').style.display = 'inline-flex';
+  }
+
+  async function loadStats() {
+    const grid = document.getElementById('statsGrid');
+    try {
+      const { stats } = await Api.get('/api/stats');
+      grid.querySelectorAll('[data-stat]').forEach((el) => {
+        animateCounter(el, stats[el.dataset.stat] || 0);
+      });
+    } catch (err) {
+      grid.querySelectorAll('.value').forEach((el) => (el.textContent = '-'));
+    }
+  }
+  loadStats();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>

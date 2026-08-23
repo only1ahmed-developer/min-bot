@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login - Adevos Min-Bot</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="assets/icons/icon-32.png" />
+<meta name="theme-color" content="#06090a" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css" />
+<link rel="stylesheet" href="css/components.css" />
+<style>
+  .auth-wrap {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .auth-card {
+    width: 100%; max-width: 400px;
+    background: var(--bg-raised); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); padding: 36px;
+    box-shadow: 0 0 60px rgba(52,255,134,0.06);
+  }
+  .auth-card .brand { justify-content: center; margin-bottom: 22px; }
+  .auth-card h1 { font-size: 1.4rem; text-align: center; }
+  .auth-card p.lead { text-align: center; font-size: 0.9rem; }
+  .toggle-password { position: absolute; right: 12px; top: 38px; background: none; border: none; color: var(--text-muted); cursor: pointer; }
+  .field { position: relative; }
+  .no-account-hint {
+    margin-top: 22px; padding: 14px; border: 1px dashed var(--line); border-radius: var(--radius-sm);
+    font-size: 0.85rem; color: var(--text-muted); text-align: center;
+  }
+  .no-account-hint a { color: var(--ring); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <a class="brand" href="index.html">
+      <img src="assets/icons/icon-192.png" width="34" height="34" alt="" />
+      <span style="font-family:var(--font-display); font-weight:700;">Adevos Min-Bot</span>
+    </a>
+    <h1>Log in to your dashboard</h1>
+    <p class="lead">Use the username and password you were given by the Telegram or WhatsApp bot.</p>
+
+    <form id="loginForm" novalidate>
+      <div class="field">
+        <label for="username">Username</label>
+        <input id="username" name="username" autocomplete="username" required />
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required />
+        <button type="button" class="toggle-password" id="togglePassword" aria-label="Show password">Show</button>
+      </div>
+      <div class="field-error" id="loginError" style="display:none;"></div>
+      <button class="btn btn-primary btn-block" type="submit" id="loginBtn">Log in</button>
+    </form>
+
+    <div class="no-account-hint">
+      No login yet? Create one from the <a href="#" id="telegramLink">Telegram bot</a> with
+      <code>/createlogins</code>, or from WhatsApp privately with <code>.createlogins</code>
+      after pairing a number.
+    </div>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/toast.js"></script>
+<script>
+  window.ADEVOS_TELEGRAM_BOT_USERNAME = window.ADEVOS_TELEGRAM_BOT_USERNAME || 'AdevosMinBot';
+  document.getElementById('telegramLink').href = `https://t.me/${window.ADEVOS_TELEGRAM_BOT_USERNAME}`;
+
+  if (Api.getToken()) window.location.href = 'dashboard.html';
+
+  document.getElementById('togglePassword').addEventListener('click', () => {
+    const input = document.getElementById('password');
+    const btn = document.getElementById('togglePassword');
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.textContent = isPassword ? 'Hide' : 'Show';
+  });
+
+  const form = document.getElementById('loginForm');
+  const errorBox = document.getElementById('loginError');
+  const loginBtn = document.getElementById('loginBtn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorBox.style.display = 'none';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Logging in...';
+
+    try {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const data = await Api.post('/api/auth/login', { username, password });
+      Api.setToken(data.token);
+      localStorage.setItem('adevos_user', JSON.stringify(data.user));
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      errorBox.textContent = err.message;
+      errorBox.style.display = 'block';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Log in';
+    }
+  });
+</script>
+</body>
+</html>
