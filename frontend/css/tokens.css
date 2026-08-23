@@ -1,0 +1,85 @@
+/*
+  Design tokens for Adevos Min-Bot.
+
+  Palette is derived from the brand mark: black field, a single glowing
+  green ring. That ring is reused everywhere in the interface as the
+  connection-status motif (pairing / connected / offline), rather than
+  a generic colored dot, so the mark and the product UI feel like the
+  same object.
+*/
+:root {
+  --bg: #06090a;
+  --bg-raised: #0c1310;
+  --bg-inset: #0a100d;
+  --line: #16241d;
+
+  --ring: #34ff86;
+  --ring-dim: #17a355;
+  --ring-glow: rgba(52, 255, 134, 0.35);
+
+  --text: #eafbf1;
+  --text-muted: #7f9d8e;
+  --text-faint: #4d6459;
+
+  --danger: #ff5c6a;
+  --warning: #ffb020;
+
+  --font-display: 'Space Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+
+  --container: 1160px;
+}
+
+* { box-sizing: border-box; }
+
+html { color-scheme: dark; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5em;
+}
+
+p { margin: 0 0 1em; color: var(--text-muted); }
+
+a { color: inherit; }
+
+code, .mono { font-family: var(--font-mono); }
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
